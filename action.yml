@@ -4,7 +4,8 @@ author: 'srz_zumix'
 inputs:
   commit:
     description: "specific commit insert to event payload"
-    required: true
+    default: '${{ github.ref }}'
+    required: false
   github_token:
     description: 'GitHub Token'
     default: '${{ github.token }}'
@@ -23,22 +24,24 @@ runs:
       run: |
         COMMIT_MESSAGE=$(git log -1 --pretty=format:"%B%-" | sed -e 's/$/\\n/g' | sed -e 's/\r/\\r/g' | tr -d '\n' | sed -e 's/\\n$//g')
         LOG_FORMAT="{
-          \"author\": {
-              \"email\": \"%ae\",
-              \"name\":\"%an\",
-              \"username\":\"%an\"
-          },
-          \"committer\":{
-              \"email\":\"%ce\",
-              \"name\":\"%cn\",
-              \"username\":\"%cn\"
-          },
-          \"distinct\":true,
-          \"id\":\"%H\",
-          \"message\":\"${COMMIT_MESSAGE}\",
-          \"timestamp\":\"%cI\",
-          \"tree_id\":\"%T\",
-          \"url\":\"${{ github.server_url }}/${{ github.repository }}/commit/%H\"
+          \"head_commit\": {
+            \"author\": {
+                \"email\": \"%ae\",
+                \"name\":\"%an\",
+                \"username\":\"%an\"
+            },
+            \"committer\":{
+                \"email\":\"%ce\",
+                \"name\":\"%cn\",
+                \"username\":\"%cn\"
+            },
+            \"distinct\":true,
+            \"id\":\"%H\",
+            \"message\":\"${COMMIT_MESSAGE}\",
+            \"timestamp\":\"%cI\",
+            \"tree_id\":\"%T\",
+            \"url\":\"${{ github.server_url }}/${{ github.repository }}/commit/%H\"
+          }
         }"
         git log -1 --pretty=format:"${LOG_FORMAT}" > "${ runner.temp }}/commit.json"
     - name: Merge Json
