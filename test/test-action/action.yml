@@ -1,0 +1,10 @@
+name: 'test-action'
+description: 'test action.'
+
+runs:
+  using: 'node16'
+  main: 'dist/main/index.js'
+
+branding:
+  icon: 'alert-octagon'
+  color: 'orange'
