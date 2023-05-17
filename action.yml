@@ -17,7 +17,7 @@ runs:
       uses: actions/checkout@v3
       with:
         token: ${{ inputs.github_token }}
-        ref: ${{ input.commit }}
+        ref: ${{ inputs.commit }}
         path: "${ runner.temp }}/target"
     - name: Get Commit Json
       shell: bash
