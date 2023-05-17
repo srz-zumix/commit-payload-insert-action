@@ -19,10 +19,8 @@ runs:
       with:
         token: ${{ inputs.github_token }}
         ref: ${{ inputs.commit }}
-        path: "${{ runner.temp }}/target"
     - name: Get Commit Json
       shell: bash
-      working-directory: "${{ runner.temp }}/target"
       run: |
         COMMIT_MESSAGE=$(git log -1 --pretty=format:"%B%-" | sed -e 's/$/\\n/g' | sed -e 's/\r/\\r/g' | tr -d '\n' | sed -e 's/\\n$//g')
         LOG_FORMAT="{
