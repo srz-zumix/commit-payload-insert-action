@@ -15,6 +15,6 @@ jobs:
     - uses: ./
       with: 
         commit: 6bb00a4
-    - uses: test/test-action
+    - uses: ./test/test-action
 
         
