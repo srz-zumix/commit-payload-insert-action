@@ -49,6 +49,7 @@ runs:
       run: |
         mv -f "${{ github.event_path }}" "${{ github.event_path }}.org"
         jq -s '.[0] * .[1]' "${{ github.event_path }}.org" "${{ runner.temp }}/commit.json" > "${{ github.event_path }}"
+        cat "${{ github.event_path }}"
 
 
 branding:
