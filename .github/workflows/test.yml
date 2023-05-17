@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: test/test-action
+    - uses: ./test/test-action
     - uses: ./
       with: 
         commit: 6bb00a4
