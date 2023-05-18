@@ -1,0 +1,60 @@
+name: 'commit-payload-insert-action'
+description: 'specific commit insert to event payload.'
+author: 'srz_zumix'
+inputs:
+  commit:
+    description: "specific commit insert to event payload"
+    default: '${{ github.ref }}'
+    required: false
+  github_token:
+    description: 'GitHub Token'
+    default: '${{ github.token }}'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout commit
+      uses: actions/checkout@v3
+      with:
+        token: ${{ inputs.github_token }}
+        ref: ${{ inputs.commit }}
+    - name: Get Commit Json
+      shell: bash
+      run: |
+        COMMIT_MESSAGE=$(git log -1 --pretty=format:"%B%-" | sed -e 's/$/\\n/g' | sed -e 's/\r/\\r/g' | tr -d '\n' | sed -e 's/\\n$//g')
+        LOG_FORMAT="{
+          \"head_commit\": {
+            \"author\": {
+                \"email\": \"%ae\",
+                \"name\":\"%an\",
+                \"username\":\"%an\"
+            },
+            \"committer\":{
+                \"email\":\"%ce\",
+                \"name\":\"%cn\",
+                \"username\":\"%cn\"
+            },
+            \"distinct\":true,
+            \"id\":\"%H\",
+            \"message\":\"${COMMIT_MESSAGE}\",
+            \"timestamp\":\"%cI\",
+            \"tree_id\":\"%T\",
+            \"url\":\"${{ github.server_url }}/${{ github.repository }}/commit/%H\"
+          }
+        }"
+        git log -1 --pretty=format:"${LOG_FORMAT}" > "${{ runner.temp }}/commit.json"
+    - name: Merge Json
+      shell: bash
+      run: |
+        mv -f "${{ github.event_path }}" "${{ github.event_path }}.org"
+        rm -f "${{ github.event_path }}"
+        jq -s '.[0] * .[1]' "${{ github.event_path }}.org" "${{ runner.temp }}/commit.json" > event.json
+        (cd $(dirname "${{ github.event_path }}") && ln -s "${{ github.workspace }}/event.json" $(basename "${{ github.event_path }}"))
+        cat event.json
+        
+
+
+branding:
+  icon: 'chevrons-right'
+  color: 'yellow'
